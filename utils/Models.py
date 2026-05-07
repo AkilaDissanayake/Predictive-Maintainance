@@ -5,14 +5,21 @@ from tensorflow.keras import layers, models
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 def build_lstm_model(input_shape):
-    """Deep LSTM for long-term degradation patterns."""
     model = models.Sequential([
         layers.Input(shape=input_shape),
+        
+        # Layer 1: Smaller units often generalize better
         layers.LSTM(64, return_sequences=True),
+        layers.BatchNormalization(), 
+        
+        # Layer 2
+        layers.LSTM(32, return_sequences=False),
+        layers.BatchNormalization(),
+        
+        # Dense Layers
+        layers.Dense(32, activation='relu'),
         layers.Dropout(0.2),
-        layers.LSTM(32),
-        layers.Dense(16, activation='relu'),
-        layers.Dense(1)  # Outputting a single RUL value
+        layers.Dense(1) # Linear activation for regression
     ])
     return model
 
